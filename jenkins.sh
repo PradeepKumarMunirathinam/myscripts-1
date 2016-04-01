@@ -5,7 +5,7 @@
 sudo apt-get update
 wget -qO- https://get.docker.com/ | sh
 #Adding users to docker group
-sudo usermod -aG docker azureuser
+sudo usermod -aG docker azureUser
 
 
 

@@ -18,4 +18,4 @@ sudo wget -O /etc/init.d/jenkins-startup https://raw.githubusercontent.com/ariji
 sudo chmod ugo+x /etc/init.d/jenkins-startup 
 sudo update-rc.d jenkins-startup defaults
 
-sudo init 6
+#sudo init 6

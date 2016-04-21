@@ -1,4 +1,4 @@
- date > /home/scripts/date.txt
+date > /home/scripts/date.txt
 
 wget -qO- https://get.docker.com/ | sh
 sudo docker pull devopsmt/jenkins-dockerindocker:v1

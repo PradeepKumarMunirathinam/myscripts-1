@@ -15,7 +15,7 @@ apt-get -y install mysql-server
 sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
 
 sudo service mysql restart
-sudo mkdir /opt/dbscript
+sudo mkdir -p /opt/dbscript
 cd /opt/dbscript && wget http://adidaswarstorage.blob.core.windows.net/sqlfileupload/myarenadb_script.sql
 mysql -u root -pwelcome123 < /opt/dbscript/myarenadb_script.sql
 echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'welcome123'; flush privileges;" | mysql -u root -pwelcome123

@@ -6,8 +6,8 @@ apt-get update
 sudo mkdir -p /opt/dbscript
 cd /opt/dbscript && wget https://adidaswarstorage.blob.core.windows.net/sqlfileupload/myarenadb_script.sql
 export DEBIAN_FRONTEND=noninteractive
-echo mysql-server-5.6 mysql-server/root_password password welcome123 | debconf-set-selections
-echo mysql-server-5.6 mysql-server/root_password_again password welcome123 | debconf-set-selections
+echo mysql-server-5.6.13 mysql-server/root_password password welcome123 | debconf-set-selections
+echo mysql-server-5.6.13 mysql-server/root_password_again password welcome123 | debconf-set-selections
 
 # install the LAMP stack
 apt-get -y install mysql-server 

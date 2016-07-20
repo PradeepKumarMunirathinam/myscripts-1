@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=$PATH:/bin/:usr/bin/
 sudo su
 apt-get update
 

@@ -1,0 +1,46 @@
+java -version
+
+#To install on OpenSuse Distribution:
+
+zypper install java-1_7_0-openjdk
+
+#Download Tomcat 8
+cd /tmp/
+wget http://apache.mirrors.hoobly.com/tomcat/tomcat-8/v8.0.18/bin/apache-tomcat-8.0.18.tar.gz
+
+#Now, we'll gonna extract the files of the tarballs to /usr/share/
+cd /usr/share/
+tar -zxvf /tmp/apache-tomcat-8.0.18.tar.gz
+ 
+#Adding tomcat user & group
+#It is highly recommended not to run Tomcat as root. So, we will need to create an unprivileged user for it and set the appropriate owner of the tomcat folder:
+groupadd tomcat
+useradd -g tomcat -s /bin/bash -d /usr/share/apache-tomcat-8.0.18 tomcat
+chown -Rf tomcat.tomcat /usr/share/apache-tomcat-8.0.18/
+
+#Running Tomcat 8
+#Now, finally we'll start our apache tomcat server. First we'll need to switch to the unprivileged user with the command below.
+su – tomcat
+
+#Then, we'll start our Apache Tomcat a shell script called startup.sh which is inside bin folder. So, we'll need to run:
+cd ~/bin
+./startup.sh
+
+./shutdown.sh
+
+#Setup user accounts
+#Finally we have to configure Tomcat users so they can access admin/manager sections. We can do that by adding the users in the ~/conf/tomcat-users.xml file with our favorite text editor.
+nano ~/conf/tomcat-users.xml
+
+#Now, we'll wanna add a manager-gui role to a user with username as linoxide and password as linoxidepass:
+<role rolename="manager-gui"/>
+<user username="linoxide" password="linoxidepass" roles="manager-gui"/>
+
+#Then, we'll wanna add an admin-gui role to an user with username as admin and password as adminpass:
+<role rolename="admin-gui"/>
+<user username="admin" password="adminpass" roles="manager-gui, admin-gui"/>
+
+#After setting up the admin and managers roles, we'll need restart the Tomcat and then try to access the admin section. To do so, we'll need to run the below commands in a shell or terminal:
+cd ~/bin
+./shutdown.sh
+./startup.sh

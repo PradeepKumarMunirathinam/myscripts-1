@@ -1,0 +1,866 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"VnetName": {
+			"type": "string",
+			"defaultValue": "MyArenaDevVnet",
+			"metadata": {
+				"description": "Suffix to use the VnetName"
+			}
+		},
+		"Subnet1NamePrefix": {
+			"type": "string",
+			"defaultValue": "MyArenaSubnet1",
+			"metadata": {
+				"description": "Suffix to use the Subnet1Name"
+			}
+		},
+		"Subnet2NamePrefix": {
+			"type": "string",
+			"defaultValue": "MyArenaSubnet2",
+			"metadata": {
+				"description": "Suffix to use the Subnet2Name"
+			}
+		},
+		"Subnet3NamePrefix": {
+			"type": "string",
+			"defaultValue": "MyArenaSubnet3",
+			"metadata": {
+				"description": "Suffix to use the Subnet3Name"
+			}
+		},
+		"StorageAccountName": {
+			"type": "string",
+			"defaultValue": "myarenadevsa",
+			"metadata": {
+				"description": "Name of the storage account"
+			}
+		},
+		"location": {
+			"type": "string",
+			"defaultValue": "West Europe",
+			"allowedValues": [
+				"Southeast Asia",
+				"East US",
+				"West US",
+				"West Europe"
+			]
+		},
+		"dnsnameforPublicIP": {
+			"type": "string",
+			"defaultValue": "myarenadevpublicip",
+			"metadata": {
+				"description": "DNS name for publicIP"
+			}
+		},
+
+		"VMName": {
+			"type": "string",
+			"defaultValue": "MyArenaDevJumpServer",
+			"metadata": {
+				"description": "this is the name of your Jump virtual machine"
+			}
+		},
+		
+		"VM2Name": {
+			"type": "string",
+			"defaultValue": "MyArenaDevWebServer1",
+			"metadata": {
+				"description": "this is the name of your application virtual machine 1"
+			}
+		},
+		"VM3Name": {
+			"type": "string",
+			"defaultValue": "MyArenaDevWebServer2",
+			"metadata": {
+				"description": "this is the name of your application virtual machine 2"
+			}
+		},
+		"VM4Name": {
+			"type": "string",
+			"defaultValue": "MyArenaDevDBServer",
+			"metadata": {
+				"description": "this is the name of your application virtual machine"
+			}
+		},
+		"VMUserName": {
+			"type": "string",
+			"defaultValue": "lx_jeralron",
+			"metadata": {
+				"description": "UserName For the VM"
+			}
+		},
+		"VMPassword": {
+			"type": "secureString",
+			"defaultValue": "Adid@s66",
+			"metadata": {
+				"description": "Password for the VM"
+			}
+		},
+		"EnvironmentPrifix": {
+			"type": "string",
+			"metadata": {
+				"description": "Prifix for the environment"
+			}
+		},
+		"osType": {
+			"type": "string",
+			"defaultValue": "linux",
+			"allowedValues": [
+				"windows",
+				"linux"
+			],
+			"metadata": {
+				"description": "This is the OS that your VM will be running"
+			}
+		},
+		"dataDiskSize": {
+			"type": "int",
+			"defaultValue": 128,
+			"metadata": {
+				"description": "The size in GB of each data disk that is attached to the VM.  A RAID-0 volume is created with all data disks that is dataDiskSize * dataDiskCount in size."
+			}
+		},
+		"vmSize": {
+			"type": "string",
+			"defaultValue": "Standard_A0",
+			"allowedValues": [
+				"Basic_A0",
+				"Standard_A0",
+				"Standard_A3",
+				"Standard_A4",
+				"Standard_A5",
+				"Standard_A6",
+				"Standard_A7",
+				"Standard_A8",
+				"Standard_A9",
+				"Standard_A10",
+				"Standard_A11",
+				"Standard_D3",
+				"Standard_D4",
+				"Standard_D12",
+				"Standard_D13",
+				"Standard_D14"
+			],
+			"metadata": {
+				"description": "This is the size of your VM"
+			}
+		}
+
+	},
+	"variables": {
+		"VnetID": "[resourceID('Microsoft.Networks/virtualNetworks',parameters('VnetName'))]",
+		"addressPrefix": "10.0.0.0/16",
+		"Subnet1Name": "[concat(parameters('EnvironmentPrifix'),parameters('Subnet1NamePrefix'))]",
+		"Subnet1Prefix": "10.0.1.0/24",
+		"Subnet2Name": "[concat(parameters('EnvironmentPrifix'),parameters('Subnet2NamePrefix'))]",
+		"subnet2Prefix": "10.0.2.0/24",
+		"Subnet3Name": "[concat(parameters('EnvironmentPrifix'),parameters('Subnet3NamePrefix'))]",
+		"Subnet3Prefix": "10.0.3.0/24",
+		"StorageAccountType": "Standard_LRS",
+		"publicIPAddressType": "Dynamic",
+		"publicIPAddressName": "[concat(parameters('EnvironmentPrifix'),'myarenapublicipaddress')]",
+		"nicName": "[concat(parameters('VMName'),'Nic')]",
+		"nic1Name": "[concat(parameters('VM2Name'),'Nic')]",
+		"nic2Name": "[concat(parameters('VM3Name'),'Nic')]",
+		"nic3Name": "[concat(parameters('VM4Name'),'Nic')]",
+		"Subnet1Ref": "[concat(variables('VnetID'),'/subnets/',variables('Subnet1Name'))]",
+		"Subnet2Ref": "[concat(variables('VnetID'),'/subnets/', variables('Subnet2Name'))]",
+		"Subnet3Ref": "[concat(variables('VnetID'),'/subnets/', variables('Subnet3Name'))]",
+		"imagePublisher": "SUSE",
+		"imageOffer": "SLES",
+		"slesOSVersion": "12-SP1",
+		"vmStorageAccountContainerName": "vhd",
+		"OSDiskName": "[concat(parameters('EnvironmentPrifix'),'osdisk')]",
+		"apisubnetNsg" :"[concat(parameters('EnvironmentPrifix'),'ApiSubnetNSG')]",
+		"dbsubnetNsg" : "[concat(parameters('EnvironmentPrifix'),'DBSubnetNSG')]",
+		"jumpsubnetNsg" : "[concat(parameters('EnvironmentPrifix'),'JumpSubnetNSG')]",
+		"publicIPAddressNameLb" :"[concat(parameters('EnvironmentPrifix'),'publicIpLB')]",
+		"availabilitySetName": "[concat(parameters('EnvironmentPrifix'),'WebServerAvSet')]",
+		"dnsname" : "[concat(parameters('EnvironmentPrifix'),'myarenaqadns')]",
+		"lbName" : "[concat(parameters('EnvironmentPrifix'),'LB')]",
+		"lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+		"lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/BackendPoolTest')]",
+		"lbProbeID": "[concat(variables('lbID'),'/probes/HTTPProbeTest')]",
+		"publicIPAddressNameLb" : "[concat(parameters('EnvironmentPrifix'),'publicIpLB')]"
+	},
+	"resources": [{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[parameters('StorageAccountName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"accountType": "[variables('StorageAccountType')]"
+			}
+		}, {
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/publicIPAddresses",
+			"name": "[variables('publicIPAddressName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+				"dnsSettings": {
+					"domainNameLabel": "[parameters('dnsnameforPublicIP')]"
+				}
+			}
+
+		},
+		{
+			"type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressNameLb')]",
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+				"dnsSettings": {
+					"domainNameLabel": "[variables('dnsname')]"
+				}
+            }
+		},
+		{
+			"type": "Microsoft.Compute/availabilitySets",
+			"name": "[variables('availabilitySetName')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[parameters('location')]",
+			"properties": {
+				"platformUpdateDomainCount": 5,
+                "platformFaultDomainCount": 3
+			}
+		},
+		{
+			"apiVersion": "2015-05-01-preview",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"name": "[variables('jumpsubnetNsg')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+					{
+						"name": "ssh_rule",
+						"properties": {
+							"description": "Allow SSH",
+							"protocol": "Tcp",
+							"sourcePortRange": "*",
+							"destinationPortRange": "22",
+							"sourceAddressPrefix": "*",
+							"destinationAddressPrefix": "*",
+							"access": "Allow",
+							"priority": 102,
+							"direction": "Inbound"
+						}
+					},
+					{
+						"name": "ssh_outbound",
+						"properties": {
+							"description": "Allow SSH",
+							"protocol": "Tcp",
+							"sourcePortRange": "*",
+							"destinationPortRange": "22",
+							"sourceAddressPrefix": "*",
+							"destinationAddressPrefix": "*",
+							"access": "Allow",
+							"priority": 103,
+							"direction": "Outbound"
+						}
+					}
+				]
+			}
+		},
+		{
+			"apiVersion": "2015-05-01-preview",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"name": "[variables('apisubnetNsg')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+					
+					{
+						"name": "sshlocalrules",
+						"properties": {
+							"description": "Allow local",
+							"protocol": "Tcp",
+							"sourcePortRange": "*",
+							"destinationPortRange": "22",
+							"sourceAddressPrefix": "[variables('Subnet1Prefix')]",
+							"destinationAddressPrefix": "*",
+							"access": "Allow",
+							"priority": 104,
+							"direction": "Inbound"
+						}
+					},
+					{
+                        "name": "Tomcat",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "8080",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1010,
+                            "direction": "Inbound"
+                        }
+                    }
+				]
+			}
+		},
+		{
+			"apiVersion": "2015-05-01-preview",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"name": "[variables('dbsubnetNsg')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+					{
+						"name": "MySQL",
+						"properties": {
+							"protocol": "Tcp",
+							"sourcePortRange": "*",
+							"destinationPortRange": "3306",
+							"sourceAddressPrefix": "VirtualNetwork",
+							"destinationAddressPrefix": "VirtualNetwork",
+							"access": "Allow",
+							"priority": 1010,
+							"direction": "Inbound"
+						}
+					},
+					{
+						"name": "sshlocalrules",
+						"properties": {
+							"description": "Allow local",
+							"protocol": "Tcp",
+							"sourcePortRange": "*",
+							"destinationPortRange": "22",
+							"sourceAddressPrefix": "[variables('Subnet1Prefix')]",
+							"destinationAddressPrefix": "*",
+							"access": "Allow",
+							"priority": 102,
+							"direction": "Inbound"
+						}
+					}
+				]
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/virtualNetworks",
+			"name": "[parameters('VnetName')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Network/networkSecurityGroups/', variables('apisubnetNsg'))]",
+				"[concat('Microsoft.Network/networkSecurityGroups/', variables('dbsubnetNsg'))]",
+				"[concat('Microsoft.Network/networkSecurityGroups/', variables('jumpsubnetNsg'))]"
+			],
+			"properties": {
+				"addressSpace": {
+					"addressPrefixes": [
+						"[variables('addressPrefix')]"
+					]
+				},
+				"subnets": [{
+					"name": "[variables('Subnet1Name')]",
+					"properties": {
+						"addressPrefix": "[variables('Subnet1Prefix')]",
+						"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jumpsubnetNsg'))]"
+										}
+							}
+				},
+				{
+					"name": "[variables('Subnet2Name')]",
+					"properties": {
+						"addressPrefix": "[variables('Subnet2Prefix')]",
+						"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('apisubnetNsg'))]"
+									}
+							}		
+				},
+				{
+					"name": "[variables('Subnet3Name')]",
+					"properties": {
+						"addressPrefix": "[variables('Subnet3Prefix')]",
+						"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('dbsubnetNsg'))]"
+								}
+							}
+				}]
+
+			}
+		}, 
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[variables('nicName')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('VnetName'))]",
+				"[concat('Microsoft.Network/networkSecurityGroups/', variables('jumpsubnetNsg'))]"
+			],
+			"properties": 
+			{
+				"ipConfigurations":
+				[{
+					"name": "ipconfig1",
+					"properties": 
+					{
+						"privateIPAllocationMethod": "Dynamic",
+						"publicIPAddress": {
+							"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+						},
+						 "subnet":
+						 {
+							"id": "[variables('Subnet1Ref')]"
+						 }
+					}
+				}],
+				"enableIPForwarding": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jumpsubnetNsg'))]"
+                }
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[variables('nic1Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('VnetName'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('apisubnetNsg'))]",
+				"[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]"
+				
+			],
+			"properties": 
+			{
+				"ipConfigurations":
+				[{
+					"name": "ipconfig1",
+					"properties": 
+					{
+						"privateIPAllocationMethod": "Dynamic",
+						 "subnet":
+						 {
+							"id": "[variables('Subnet2Ref')]"
+						 },
+						 "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/backendAddressPools/BackendPoolTest')]"
+                                }
+                            ]
+					}
+				}],
+				 "enableIPForwarding": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('apisubnetNsg'))]"
+                }
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[variables('nic2Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('VnetName'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('apisubnetNsg'))]",
+				"[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]"
+			],
+			"properties": 
+			{
+				"ipConfigurations":
+				[{
+					"name": "ipconfig1",
+					"properties": 
+					{
+						"privateIPAllocationMethod": "Dynamic",
+						 "subnet":
+						 {
+							"id": "[variables('Subnet2Ref')]"
+						 },
+						  "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/backendAddressPools/BackendPoolTest')]"
+                                }
+                            ]
+					}
+				}],
+				"enableIPForwarding": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('apisubnetNsg'))]"
+                }
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[variables('nic3Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('VnetName'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('dbsubnetNsg'))]"
+			],
+			"properties": 
+			{
+				"ipConfigurations":
+				[{
+					"name": "ipconfig1",
+					"properties": 
+					{
+						"privateIPAllocationMethod": "Dynamic",
+						 "subnet":
+						 {
+							"id": "[variables('Subnet3Ref')]"
+						 }
+					}
+				}],
+				"enableIPForwarding": false,
+                "networkSecurityGroup": {
+                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('dbsubnetNsg'))]"
+                }
+			}
+		},
+			{
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[variables('lbName')]",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressNameLb'))]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "BackendPoolTest"
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "Tomcat",
+                        "properties": {
+                            "frontendIPConfiguration": {
+								"id" : "[concat(variables('lbID'), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+                            },
+                            "frontendPort": 80,
+                            "backendPort": 8080,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "loadDistribution": "SourceIP",
+                            "backendAddressPool": {
+                                "id": "[variables('lbPoolID')]"
+                            },
+                            "probe": {
+                                "id": "[variables('lbProbeID')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "HTTPProbeTest",
+                        "properties": {
+                            "protocol": "Http",
+                            "port": 8080,
+                            "requestPath": "/",
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2
+                        }
+                    }
+                ],
+                "inboundNatRules": [],
+                "outboundNatRules": [],
+                "inboundNatPools": []
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressNameLb'))]"
+            ]
+        },
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "[parameters('VMName')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccountName'))]",
+				"[concat('Microsoft.Network/networkInterfaces/',variables('nicName'))]"
+			],
+			"properties": {
+				"hardwareProfile": {
+					"vmSize": "[parameters('vmSize')]"
+				},
+				"osProfile": {
+					"computerName": "[parameters('VMName')]",
+					"adminUsername": "[parameters('VMUserName')]",
+					"adminPassword": "[parameters('VMPassword')]"
+				},
+				"storageProfile": {
+					"imageReference": {
+						"publisher": "[variables('imagePublisher')]",
+						"offer": "[variables('imageOffer')]",
+						"sku": "[variables('slesOSVersion')]",
+						"version": "latest"
+					},
+					"osDisk": {
+						"name": "osdisk",
+						"vhd": {
+							"uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),parameters('VMName'),'.vhd')]"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage"
+					},
+					"dataDisks": [{
+						"name": "datadisk0",
+						"diskSizeGB": "[parameters('dataDiskSize')]",
+						"lun": 0,
+						"vhd": {
+							"Uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('VMName'),'-datadisk0.vhd')]"
+						},
+						"caching": "None",
+						"createOption": "Empty"
+					}]
+				},
+				"networkProfile": {
+					"networkInterfaces": [{
+						"id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+						}]
+					}
+				}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "[parameters('VM2Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccountName'))]",
+				"[concat('Microsoft.Network/networkInterfaces/',variables('nic1Name'))]",
+				"[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+			],
+			"properties": {
+				"availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+				"hardwareProfile": {
+					"vmSize": "Standard_A2"
+				},
+				"osProfile": {
+					"computerName": "[parameters('VM2Name')]",
+					"adminUsername": "[parameters('VMUserName')]",
+					"adminPassword": "[parameters('VMPassword')]"
+				},
+				"storageProfile": {
+					"imageReference": {
+						"publisher": "[variables('imagePublisher')]",
+						"offer": "[variables('imageOffer')]",
+						"sku": "[variables('slesOSVersion')]",
+						"version": "latest"
+					},
+					"osDisk": {
+						"name": "osdisk1",
+						"vhd": {
+							"uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),parameters('VM2Name'),'.vhd')]"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage"
+					},
+					"dataDisks": [{
+						"name": "datadisk1",
+						"diskSizeGB": "[parameters('dataDiskSize')]",
+						"lun": 0,
+						"vhd": {
+							"Uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('VM2Name'),'-datadisk1.vhd')]"
+						},
+						"caching": "None",
+						"createOption": "Empty"
+					}]
+				},
+				"networkProfile": {
+					"networkInterfaces": [{
+						"id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nic1Name'))]"
+					}]
+				}
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "[parameters('VM3Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccountName'))]",
+				"[concat('Microsoft.Network/networkInterfaces/',variables('nic2Name'))]",
+				"[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+			],
+			"properties": {
+					"availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+				"hardwareProfile": {
+					"vmSize": "Standard_A2"
+				},
+				"osProfile": {
+					"computerName": "[parameters('VM3Name')]",
+					"adminUsername": "[parameters('VMUserName')]",
+					"adminPassword": "[parameters('VMPassword')]"
+				},
+				"storageProfile": {
+					"imageReference": {
+						"publisher": "[variables('imagePublisher')]",
+						"offer": "[variables('imageOffer')]",
+						"sku": "[variables('slesOSVersion')]",
+						"version": "latest"
+					},
+					"osDisk": {
+						"name": "osdisk2",
+						"vhd": {
+							"uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),parameters('VM3Name'),'.vhd')]"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage"
+					},
+					"dataDisks": [{
+						"name": "datadisk2",
+						"diskSizeGB": "[parameters('dataDiskSize')]",
+						"lun": 0,
+						"vhd": {
+							"Uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('VM3Name'),'-datadisk2.vhd')]"
+						},
+						"caching": "None",
+						"createOption": "Empty"
+					}]
+				},
+				"networkProfile": {
+					"networkInterfaces": [{
+						"id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nic2Name'))]"
+					}]
+				}
+			}
+		},
+		{
+			"apiVersion": "2015-06-15",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "[parameters('VM4Name')]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccountName'))]",
+				"[concat('Microsoft.Network/networkInterfaces/',variables('nic3Name'))]"
+			],
+			"properties": {
+				"hardwareProfile": {
+					"vmSize": "Standard_A1"
+				},
+				"osProfile": {
+					"computerName": "[parameters('VM4Name')]",
+					"adminUsername": "[parameters('VMUserName')]",
+					"adminPassword": "[parameters('VMPassword')]"
+				},
+				"storageProfile": {
+					"imageReference": {
+						"publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "14.04.2-LTS",
+                        "version": "latest"
+					},
+					"osDisk": {
+						"name": "osdisk3",
+						"vhd": {
+							"uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),parameters('VM4Name'),'.vhd')]"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage"
+					},
+					"dataDisks": [{
+						"name": "datadisk3",
+						"diskSizeGB": "[parameters('dataDiskSize')]",
+						"lun": 0,
+						"vhd": {
+							"Uri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('VM4Name'),'-datadisk3.vhd')]"
+						},
+						"caching": "None",
+						"createOption": "Empty"
+					}]
+				},
+				"networkProfile": {
+					"networkInterfaces": [{
+						"id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nic3Name'))]"
+					}]
+					}
+				}
+		},
+		{
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(parameters('VM2Name'), '/script')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Compute/virtualMachines/', parameters('VM2Name'))]"
+			],
+			"properties": {
+				"publisher": "Microsoft.OSTCExtensions",
+				"type": "CustomScriptForLinux",
+				"typeHandlerVersion": "1.2",
+				"settings": {
+					"fileUris": [
+						"https://raw.githubusercontent.com/PradeepKumarMunirathinam/myscripts-1/master/java.sh?_sm_au_=iPH22PPsPSMtTJPM"
+					],
+					"commandToExecute": "sh java.sh"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(parameters('VM3Name'), '/script')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Compute/virtualMachines/', parameters('VM3Name'))]"
+			],
+			"properties": {
+				"publisher": "Microsoft.OSTCExtensions",
+				"type": "CustomScriptForLinux",
+				"typeHandlerVersion": "1.2",
+				"settings": {
+					"fileUris": [
+						"https://raw.githubusercontent.com/PradeepKumarMunirathinam/myscripts-1/master/java.sh?_sm_au_=iPH22PPsPSMtTJPM"
+					],
+					"commandToExecute": "sh java.sh"
+				}
+			}
+		},
+			 {
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(parameters('VM4Name'), '/script')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Compute/virtualMachines/', parameters('VM4Name'))]"
+			],
+			"properties": {
+				"publisher": "Microsoft.OSTCExtensions",
+				"type": "CustomScriptForLinux",
+				"typeHandlerVersion": "1.2",
+				"settings": {
+					"fileUris": [
+						"https://raw.githubusercontent.com/m1028639/myscripts/master/install-mysql.sh?_sm_au_=iPHWWtMRHHDNMTBH"
+					],
+					"commandToExecute": "sh install-mysql.sh"
+				}
+			}
+		}
+		
+	]
+
+}

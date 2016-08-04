@@ -1,4 +1,5 @@
 #!/bin/sh  
+chmod 600 /home/lx_jeralron/.ssh/authorized_keys
 if [ -d /opt/java/ ]
 then
 rm -rf /opt/java

@@ -181,8 +181,7 @@
 		"lbName" : "[concat(parameters('EnvironmentPrifix'),'LB')]",
 		"lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
 		"lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/BackendPoolTest')]",
-		"lbProbeID": "[concat(variables('lbID'),'/probes/HTTPProbeTest')]",
-		"publicIPAddressNameLb" : "[concat(parameters('EnvironmentPrifix'),'publicIpLB')]"
+		"lbProbeID": "[concat(variables('lbID'),'/probes/HTTPProbeTest')]"
 	},
 	"resources": [{
 			"apiVersion": "2015-06-15",

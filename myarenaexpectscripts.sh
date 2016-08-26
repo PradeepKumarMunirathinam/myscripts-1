@@ -1,3 +1,4 @@
+#!/bin/sh
 cd /home/lx_jeralron
 wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/calling.sh
 wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copycmd.sh

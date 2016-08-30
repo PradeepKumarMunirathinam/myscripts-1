@@ -2,4 +2,4 @@
 
 cd /home/lx_jeralron/
 
-mkdir MyArenaWar.sh
+mkdir MyArenaWar

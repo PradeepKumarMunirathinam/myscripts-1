@@ -35,3 +35,17 @@ jGVeADfQeS6TH/V9wZGNbDJjsqPGbq/rsauBQ4krObPzULCQUksqfphaaINkcUTA
 
 " > /home/lx_jeralron/.pem/adidas.pem
  chmod 500 /home/lx_jeralron/.pem/adidas.pem
+ 
+#e==========EXTENSION TO PULL SCRIPTS FROM BLOB STORAG
+
+cd /home/lx_jeralron
+
+wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/calling.sh
+wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copycmd.sh
+wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copycmd2.sh
+wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copywar.exp
+wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copywar2.exp
+
+
+chmod 755 calling* copy*
+chown lx_jeralron calling* copy*

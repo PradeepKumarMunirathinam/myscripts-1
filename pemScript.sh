@@ -48,4 +48,4 @@ wget https://myarenaprod4098.blob.core.windows.net/scripts/scripts/copywar2.exp
 
 
 chmod 755 calling* copy*
-chown lx_jeralron calling* copy*
+chown -R lx_jeralron calling* copy*

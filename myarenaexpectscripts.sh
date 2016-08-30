@@ -15,5 +15,5 @@ wget https://raw.githubusercontent.com/PradeepKumarMunirathinam/myscripts-1/MyAr
 #copying copywar2.exp
 wget https://raw.githubusercontent.com/PradeepKumarMunirathinam/myscripts-1/MyArena/copywar2.sh?_sm_au_=iVVnN7Str1tP3Prr
 
-#copying Make MyArenaWar directory
+#Making the directory MyArenaWar
 wget https://raw.githubusercontent.com/PradeepKumarMunirathinam/myscripts-1/MyArena/MakeMyArenaWarDirectory.sh?_sm_au_=iVVnN7Str1tP3Prr

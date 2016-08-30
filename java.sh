@@ -40,6 +40,7 @@ chmod 700 *.sh
 chown -R lx_jeralron /opt/tomcat/
 cd /opt/tomcat/apache-tomcat-8.0.36/webapps
 #wget https://adidaswarstorage.blob.core.windows.net/warfileupload/MyArenaREST.war
-cd /opt/tomcat/apache-tomcat-8.0.36/bin/ 
+cd /opt/tomcat/apache-tomcat-8.0.36/bin/
+export JAVA_OPTS="-Dspring.profiles.active=dev"
 sudo sh /opt/tomcat/apache-tomcat-8.0.36/bin/startup.sh
 

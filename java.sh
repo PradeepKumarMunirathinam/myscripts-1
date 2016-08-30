@@ -41,6 +41,6 @@ chown -R lx_jeralron /opt/tomcat/
 cd /opt/tomcat/apache-tomcat-8.0.36/webapps
 #wget https://adidaswarstorage.blob.core.windows.net/warfileupload/MyArenaREST.war
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
-export JAVA_OPTS="-Dspring.profiles.active=dev"
+sed -i "s/# Licensed to the Apache Software Foundation (ASF) under one or more/JAVA_OPTS='-Dspring.profiles.active=dev'/" catalina.sh
 sudo sh /opt/tomcat/apache-tomcat-8.0.36/bin/startup.sh
 

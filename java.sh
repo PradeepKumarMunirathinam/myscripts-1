@@ -37,8 +37,9 @@ md5sum /opt/tomcat/apache-tomcat-8.0.36.zip
 unzip apache-tomcat-8.0.36.zip
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
 chmod 700 *.sh
+chown -R lx_jeralron /opt/tomcat/
 cd /opt/tomcat/apache-tomcat-8.0.36/webapps
-wget https://adidaswarstorage.blob.core.windows.net/warfileupload/MyArenaREST.war
+#wget https://adidaswarstorage.blob.core.windows.net/warfileupload/MyArenaREST.war
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/ 
 sudo sh /opt/tomcat/apache-tomcat-8.0.36/bin/startup.sh
 

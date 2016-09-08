@@ -30,16 +30,14 @@ else
 mkdir /opt/tomcat
 fi
 cd /opt/tomcat/
-wget http://apache.cs.utah.edu/tomcat/tomcat-8/v8.0.36/bin/apache-tomcat-8.0.36.zip
-wget https://www.apache.org/dist/tomcat/tomcat-8/v8.0.36/bin/apache-tomcat-8.0.36.zip.md5
+wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip
+wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip.md5
 cat /opt/tomcat/apache-tomcat-8.0.36.zip.md5
 md5sum /opt/tomcat/apache-tomcat-8.0.36.zip
 unzip apache-tomcat-8.0.36.zip
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
 chmod 700 *.sh
 chown -R lx_jeralron /opt/tomcat/
-cd /opt/tomcat/apache-tomcat-8.0.36/webapps
-#wget https://adidaswarstorage.blob.core.windows.net/warfileupload/MyArenaREST.war
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
 sed -i "s/# Licensed to the Apache Software Foundation (ASF) under one or more/JAVA_OPTS='-Dspring.profiles.active=dev'/" catalina.sh
 sudo sh /opt/tomcat/apache-tomcat-8.0.36/bin/startup.sh

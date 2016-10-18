@@ -1,3 +1,4 @@
+
 #!/bin/bash
 apt-get update
 
@@ -14,6 +15,9 @@ sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my
 
 service mysql restart
 echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'welcome123'; flush privileges;" | mysql -u root -pwelcome123
+
+GRANT ALL PRIVILEGES ON mysql.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
 #echo "CREATE DATABASE sonar CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'sonar' IDENTIFIED BY 'sonar';GRANT ALL PRIVILEGES ON sonar.* TO 'sonar'@'%' IDENTIFIED BY 'sonar'; GRANT ALL ON sonar.* TO 'sonar'@'localhost' IDENTIFIED BY 'sonar'; flush privileges;" | mysql -u root -pwelcome123
 
 #creating use with name ma_user and grant all previlages for the machine in a perticular subnet.

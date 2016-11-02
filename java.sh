@@ -39,6 +39,6 @@ cd /opt/tomcat/apache-tomcat-8.0.36/bin/
 chmod 700 *.sh
 chown -R lx_jeralron /opt/tomcat/
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
-sed -i "s/# Licensed to the Apache Software Foundation (ASF) under one or more/JAVA_OPTS='-Dspring.profiles.active=dev'/" catalina.sh
+sed -i "s/# Licensed to the Apache Software Foundation (ASF) under one or more/JAVA_OPTS='-Dspring.profiles.active=prod'/" catalina.sh
 sudo sh /opt/tomcat/apache-tomcat-8.0.36/bin/startup.sh
 

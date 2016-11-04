@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 set timeout 20
-spawn "./ScalesetPullWar.sh"
+spawn sudo scp -r -i /home/lx_jeralron/.pem/adidas.pem lx_jeralron@10.4.0.4:/home/lx_jeralron/LastStable/MyArenaREST.war /opt/tomcat/apache-tomcat-8.0.36/webapps
 expect {
            "Are you sure you want to continue connecting (yes/no)? " {
             send "yes\r"

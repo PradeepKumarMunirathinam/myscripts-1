@@ -1,0 +1,13 @@
+#!/usr/bin/expect
+set timeout 20
+spawn "./ScalesetPullWar.sh"
+expect {
+           "Are you sure you want to continue connecting (yes/no)? " {
+            send "yes\r"
+            exp_continue
+      }
+          "Enter passphrase for key '/home/lx_jeralron/adidas.pem': " {
+            send "Cr1t1c@l\r"
+            interact
+      }
+}

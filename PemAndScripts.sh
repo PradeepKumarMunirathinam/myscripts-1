@@ -40,16 +40,16 @@ jGVeADfQeS6TH/V9wZGNbDJjsqPGbq/rsauBQ4krObPzULCQUksqfphaaINkcUTA
 
 cd /home/lx_jeralron
 
-wget https://qamyarenasa.blob.core.windows.net/scripts/Deploy.sh
-wget https://qamyarenasa.blob.core.windows.net/scripts/LoginToWebServer1.exp
-wget https://qamyarenasa.blob.core.windows.net/scripts/LoginToWebServer1ForRB.exp
-wget https://qamyarenasa.blob.core.windows.net/scripts/LoginToWebServer2.exp
-wget https://qamyarenasa.blob.core.windows.net/scripts/LoginToWebServer2ForRB.exp
-wget https://qamyarenasa.blob.core.windows.net/scripts/MarkStable.sh
-wget https://qamyarenasa.blob.core.windows.net/scripts/pullWarToDeploy.sh
-wget https://qamyarenasa.blob.core.windows.net/scripts/PushWarToWebServer1.sh
-wget https://qamyarenasa.blob.core.windows.net/scripts/PushWarToWebServer2.sh
-wget https://qamyarenasa.blob.core.windows.net/scripts/RollBack.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/Deploy.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/LoginToWebServer1.exp
+wget https://myarenaa.blob.core.windows.net/prodscripts/LoginToWebServer1ForRB.exp
+wget https://myarenaa.blob.core.windows.net/prodscripts/LoginToWebServer2.exp
+wget https://myarenaa.blob.core.windows.net/prodscripts/LoginToWebServer2ForRB.exp
+wget https://myarenaa.blob.core.windows.net/prodscripts/MarkStable.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/pullWarToDeploy.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/PushWarToWebServer1.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/PushWarToWebServer2.sh
+wget https://myarenaa.blob.core.windows.net/prodscripts/RollBack.sh
 
 
 chmod 755 Deploy* Login* Mark* pull* Push* Roll*

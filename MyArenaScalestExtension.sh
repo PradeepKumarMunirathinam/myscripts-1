@@ -70,8 +70,8 @@ else
 mkdir /opt/tomcat
 fi
 cd /opt/tomcat/
-wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip
-wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip.md5
+wget https://myarenaa.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip
+wget https://myarenaa.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip.md5
 cat /opt/tomcat/apache-tomcat-8.0.36.zip.md5
 md5sum /opt/tomcat/apache-tomcat-8.0.36.zip
 unzip apache-tomcat-8.0.36.zip

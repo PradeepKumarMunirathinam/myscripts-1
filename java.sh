@@ -34,6 +34,7 @@ wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.z
 wget https://myarenaprod4098.blob.core.windows.net/tomcat/apache-tomcat-8.0.36.zip.md5
 cat /opt/tomcat/apache-tomcat-8.0.36.zip.md5
 md5sum /opt/tomcat/apache-tomcat-8.0.36.zip
+apt-get install unzip
 unzip apache-tomcat-8.0.36.zip
 cd /opt/tomcat/apache-tomcat-8.0.36/bin/
 chmod 700 *.sh
